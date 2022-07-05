@@ -93,7 +93,8 @@ runs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
-        releaseNameRegEx: '/.*/'
+        releaseNameRegEx: '${{ inputs.sofa_version }}.*'
+        repo: 'sofa-framework/sofa'
 
     - name: Set env vars
       id: set-env-vars
