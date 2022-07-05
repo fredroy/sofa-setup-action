@@ -86,16 +86,6 @@ runs:
         mv "${{ runner.tool_cache }}" "${{ runner.tool_cache }}.old"
         mkdir -p "${{ runner.tool_cache }}"
 
-    - if: inputs.sofa_version != 'master'
-      name: Get the latest SOFA ${{ inputs.sofa_version }} binaries from GitHub (1/2)
-      id: get_sofa_from_github
-      uses: cardinalby/git-get-release-action@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        releaseNameRegEx: '${{ inputs.sofa_version }}.*'
-        repo: 'sofa-framework/sofa'
-
     - name: Set env vars
       id: set-env-vars
       shell: bash
@@ -380,6 +370,16 @@ runs:
         echo "EIGEN3_ROOT=$EIGEN_INSTALL_DIR" | tee -a $GITHUB_ENV
         echo "Eigen3_ROOT=$EIGEN_INSTALL_DIR" | tee -a $GITHUB_ENV
         echo "$EIGEN_INSTALL_DIR" >> $GITHUB_PATH
+
+    - if: inputs.sofa_version != 'master'
+      name: Get the latest SOFA ${{ inputs.sofa_version }} binaries from GitHub (1/2)
+      id: get_sofa_from_github
+      uses: cardinalby/git-get-release-action@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        releaseNameRegEx: '${{ inputs.sofa_version }}.*'
+        repo: 'sofa-framework/sofa'
 
     - if: ${{ inputs.sofa_version }} != 'master'
       name: Get the latest SOFA ${{ inputs.sofa_version }} binaries from GitHub (2/2)
