@@ -25,7 +25,7 @@ inputs:
     default: 'latest'
   pybind11_version:
     description: 'pybind11 version to install'
-    default: '2.4.3'
+    default: '2.6.2'
   qt_version:
     description: 'Qt version to install'
     default: '5.12.8'
@@ -270,48 +270,15 @@ runs:
         $PYTHON_EXE -m pip show numpy scipy
         echo '------------------------------'
 
-    - name: Setup cache for pybind11 files
-      uses: actions/cache@v2
-      id: pybind11_cache
-      with:
-        path: ${{ env.PYBIND11_INSTALL_DIR }}
-        key: pybind11-${{ inputs.pybind11_version }}_${{ runner.os }}_python-${{ inputs.python_version }}_${{ hashFiles('**/*.yml') }}
-
     - name: Install pybind11 ${{ inputs.pybind11_version }}
       shell: bash
       run: |
-        # TODO: use pip when minimal supported pybind11 will be >= 2.6.2
-        #$PYTHON_EXE -m pip install pybind11==${{ inputs.pybind11_version }}
-        #pybind11_DIR="pybind11-dir-not-found"
-        #if [ -e "$(command -v pybind11-config)" ]; then
-        #  pybind11_DIR="$(pybind11-config --cmakedir)"
-        #elif [ -e "$(command -v pybind11-config-${{ inputs.python_version }})" ]; then
-        #  pybind11_DIR="$(pybind11-config-${{ inputs.python_version }} --cmakedir)"
-        #fi
-
-        if ! ls -a "$PYBIND11_INSTALL_DIR"/* >/dev/null 2>&1; then
-          # directory does not exist or is empty
-          git clone -b v${{ inputs.pybind11_version }} --depth 1 https://github.com/pybind/pybind11.git "${{ runner.temp }}/pybind11_tmp"
-          cmake_options="-GNinja \
-              -DCMAKE_BUILD_TYPE=Release \
-              -DCMAKE_INSTALL_PREFIX=$PYBIND11_INSTALL_DIR \
-              -DPYBIND11_TEST=OFF \
-              -DPYTHON_EXECUTABLE=$PYTHON_EXE \
-              "
-          cmake_options="$(echo $cmake_options)" # prettify
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            cmd //c "$VS_VSDEVCMD \
-              && cd /d ${{ runner.temp }}/pybind11_tmp \
-              && cmake $cmake_options . \
-              && ninja install"
-          else
-            cd "${{ runner.temp }}/pybind11_tmp"
-            cmake $cmake_options .
-            ninja install
-          fi
+        if [[ "${{ inputs.pybind11_version }}" == "latest" ]]; then
+          $PYTHON_EXE -m pip install pybind11
+        else
+          $PYTHON_EXE -m pip install pybind11==${{ inputs.pybind11_version }}
         fi
-
-        pybind11_DIR="$PYBIND11_INSTALL_DIR/share/cmake/pybind11"
+        pybind11_DIR="$( $PYTHON_EXE -m pybind11 --cmakedir )"
         echo "pybind11_DIR=$pybind11_DIR" | tee -a $GITHUB_ENV
 
     - name: Setup cache for Qt files
