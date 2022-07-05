@@ -408,12 +408,12 @@ runs:
           else
             # Release was not found on GitHub, try to get it from Jenkins
             SOFA_OS_JENKINS="$RUNNER_OS"
-            if [[ "$SOFA_OS_GITHUB" == "Linux" ]]; then
-              SOFA_OS_GITHUB="Linux"
-            elif [[ "$SOFA_OS_GITHUB" == "Windows" ]]; then
-              SOFA_OS_GITHUB="Windows"
-            elif [[ "$SOFA_OS_GITHUB" == "macOS" ]]; then
-              SOFA_OS_GITHUB="MacOS"
+            if [[ "$SOFA_OS_JENKINS" == "Linux" ]]; then
+              SOFA_OS_JENKINS="Linux"
+            elif [[ "$SOFA_OS_JENKINS" == "Windows" ]]; then
+              SOFA_OS_JENKINS="Windows"
+            elif [[ "$SOFA_OS_JENKINS" == "macOS" ]]; then
+              SOFA_OS_JENKINS="MacOS"
             fi
             mkdir -p "${{ runner.temp }}/sofa_tmp/zip" "${{ runner.temp }}/sofa_tmp/binaries"
             urlPrefix="https://ci.inria.fr/sofa-ci-dev/job/nightly-generate-binaries/CI_BRANCH=${{ inputs.sofa_version }},CI_SCOPE=${{ inputs.sofa_scope }}"
