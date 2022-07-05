@@ -96,7 +96,7 @@ runs:
         cp "${{ github.action_path }}"/*.yml "$GITHUB_WORKSPACE/sofa-setup-action"
         ls -la "$GITHUB_WORKSPACE/sofa-setup-action"
         echo "------------------------------------------------"
-        
+
         # Set executable extension
         EXE=''
         if [[ "$RUNNER_OS" == "Windows" ]]; then
@@ -104,7 +104,7 @@ runs:
         fi
         echo "EXE=$EXE" | tee -a $GITHUB_ENV
         echo "::set-output name=exe::$(echo $EXE)"
-        
+
         if [ -n "${{ github.event.number }}" ]; then
           RUN_BRANCH="PR-${{ github.event.number }}"
         elif [ -n "${{ github.event.pull_request.number }}" ]; then
@@ -116,7 +116,7 @@ runs:
         fi
         echo "RUN_BRANCH=$RUN_BRANCH" | tee -a $GITHUB_ENV
         echo "::set-output name=run_branch::$(echo $RUN_BRANCH)"
-        
+
         # Auto-setup workspace + env vars
         if [[ "${{ inputs.workspace_auto_setup }}" == "true" ]]; then
           mkdir -p "$GITHUB_WORKSPACE/src" "$GITHUB_WORKSPACE/build" "$GITHUB_WORKSPACE/install" "$GITHUB_WORKSPACE/artifact"
@@ -138,14 +138,14 @@ runs:
         echo "::set-output name=workspace_build_path::$(echo $WORKSPACE_BUILD_PATH)"
         echo "::set-output name=workspace_install_path::$(echo $WORKSPACE_INSTALL_PATH)"
         echo "::set-output name=workspace_artifact_path::$(echo $WORKSPACE_ARTIFACT_PATH)"
-        
+
         # Set default settings for ccache
         echo "CCACHE_COMPRESS=true" | tee -a $GITHUB_ENV
         echo "CCACHE_COMPRESSLEVEL=6" | tee -a $GITHUB_ENV
         echo "CCACHE_MAXSIZE=1G" | tee -a $GITHUB_ENV
         echo "CCACHE_BASEDIR=$WORKSPACE_BUILD_PATH" | tee -a $GITHUB_ENV
         echo "CCACHE_DIR=$GITHUB_WORKSPACE/.ccache" | tee -a $GITHUB_ENV
-        
+
         # TODO: find a better way to handle dependency versions
         QT_INSTALL_DIR="$HOME/Qt"
         EIGEN_INSTALL_DIR="$(cd "$HOME" && pwd -W 2>/dev/null || pwd)/eigen"
@@ -162,12 +162,12 @@ runs:
           EIGEN_INSTALL_DIR="C:/eigen"
           BOOST_VERSION=1.69.0
           BOOST_INSTALL_DIR="C:/boost"
-          
+
           # vsdevcmd.bat is here: 'C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/Tools/vsdevcmd.bat'
           VS_INSTALL_DIR="$(cmd //c 'vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath')"
           VS_VSDEVCMD='cd /d '$VS_INSTALL_DIR'\Common7\Tools && VsDevCmd.bat -host_arch=amd64 -arch=amd64'
         fi
-        
+
         echo "SUDO=$SUDO" | tee -a $GITHUB_ENV
         echo "QT_INSTALL_DIR=$QT_INSTALL_DIR" | tee -a $GITHUB_ENV
         echo "EIGEN_INSTALL_DIR=$EIGEN_INSTALL_DIR" | tee -a $GITHUB_ENV
@@ -176,7 +176,7 @@ runs:
         echo "PYBIND11_INSTALL_DIR=$PYBIND11_INSTALL_DIR" | tee -a $GITHUB_ENV
         echo "VS_INSTALL_DIR=$VS_INSTALL_DIR" | tee -a $GITHUB_ENV
         echo "VS_VSDEVCMD=$VS_VSDEVCMD" | tee -a $GITHUB_ENV
-        
+
         echo "::set-output name=vs_install_dir::$(echo $VS_INSTALL_DIR)"
         echo "::set-output name=vs_vsdevcmd::$(echo $VS_VSDEVCMD)"
 
@@ -213,7 +213,7 @@ runs:
         mkdir -p "$PYTHONUSERBASE" && chmod -R 777 "$PYTHONUSERBASE"
         echo "PYTHONUSERBASE=$PYTHONUSERBASE" | tee -a $GITHUB_ENV
         echo "PYTHONIOENCODING=UTF-8" | tee -a $GITHUB_ENV
-        
+
         # Set PYTHON_ROOT and PYTHON_EXE
         PYTHON_ROOT="$(find $RUNNER_TOOL_CACHE -maxdepth 3 -type d -path '**/Python/${{ steps.install-python.outputs.python-version }}*/x64')"
         PYTHON_ROOT="$(cd $PYTHON_ROOT && pwd -W 2>/dev/null || pwd)"
@@ -233,10 +233,10 @@ runs:
         echo "------- ls -la PYTHON_ROOT -------"
         ls -la "$PYTHON_ROOT"
         echo "----------------------------------"
-        
+
         # Upgrade pip
         $PYTHON_EXE -m pip install --upgrade pip
-        
+
         # Set SOFA_VERSION_FOR_DEPS
         SOFA_VERSION_FOR_DEPS="$(echo "${{ inputs.sofa_version }}" | sed 's:[^0-9]*::g')"
         if [ -z "$SOFA_VERSION_FOR_DEPS" ]; then
@@ -260,14 +260,14 @@ runs:
         echo '---- pip show numpy scipy ----'
         $PYTHON_EXE -m pip show numpy scipy
         echo '------------------------------'
- 
+
     - name: Setup cache for pybind11 files
       uses: actions/cache@v2
       id: pybind11_cache
       with:
         path: ${{ env.PYBIND11_INSTALL_DIR }}
         key: pybind11-${{ inputs.pybind11_version }}_${{ runner.os }}_python-${{ inputs.python_version }}_${{ hashFiles('**/*.yml') }}
-    
+
     - name: Install pybind11 ${{ inputs.pybind11_version }}
       shell: bash
       run: |
@@ -279,17 +279,17 @@ runs:
         #elif [ -e "$(command -v pybind11-config-${{ inputs.python_version }})" ]; then
         #  pybind11_DIR="$(pybind11-config-${{ inputs.python_version }} --cmakedir)"
         #fi
-        
+
         if ! ls -a "$PYBIND11_INSTALL_DIR"/* >/dev/null 2>&1; then
           # directory does not exist or is empty
-          git clone -b v${{ inputs.pybind11_version }} --depth 1 https://github.com/pybind/pybind11.git "${{ runner.temp }}/pybind11_tmp"          
+          git clone -b v${{ inputs.pybind11_version }} --depth 1 https://github.com/pybind/pybind11.git "${{ runner.temp }}/pybind11_tmp"
           cmake_options="-GNinja \
               -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_INSTALL_PREFIX=$PYBIND11_INSTALL_DIR \
               -DPYBIND11_TEST=OFF \
               -DPYTHON_EXECUTABLE=$PYTHON_EXE \
               "
-          cmake_options="$(echo $cmake_options)" # prettify          
+          cmake_options="$(echo $cmake_options)" # prettify
           if [[ "$RUNNER_OS" == "Windows" ]]; then
             cmd //c "$VS_VSDEVCMD \
               && cd /d ${{ runner.temp }}/pybind11_tmp \
@@ -301,7 +301,7 @@ runs:
             ninja install
           fi
         fi
-        
+
         pybind11_DIR="$PYBIND11_INSTALL_DIR/share/cmake/pybind11"
         echo "pybind11_DIR=$pybind11_DIR" | tee -a $GITHUB_ENV
 
@@ -312,7 +312,7 @@ runs:
       with:
         path: ${{ env.QT_INSTALL_DIR }}
         key: qt-${{ inputs.qt_version }}_${{ runner.os }}_for-SOFA-${{ inputs.sofa_version }}_${{ hashFiles('**/*.yml') }}
-        
+
     - name: Install Qt
       if: inputs.sofa_scope != 'minimal'
       shell: bash
@@ -412,7 +412,7 @@ runs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         releaseNameRegEx: 'v${{ inputs.sofa_version }}.*'
-        
+
     - if: ${{ inputs.sofa_version }} != 'master'
       name: Get the latest SOFA ${{ inputs.sofa_version }} binaries from GitHub (2/2)
       run: |
@@ -434,7 +434,7 @@ runs:
           $SUDO mkdir -p "${{ inputs.sofa_root }}"
           $SUDO mv "${{ runner.temp }}"/sofa_tmp/binaries/SOFA_*/* "${{ inputs.sofa_root }}"
         fi
-     
+
     - if: inputs.sofa_version == 'master'
       name: Get the latest SOFA ${{ inputs.sofa_version }} binaries from Jenkins
       shell: bash
