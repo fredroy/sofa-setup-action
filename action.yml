@@ -415,6 +415,7 @@ runs:
 
     - if: ${{ inputs.sofa_version }} != 'master'
       name: Get the latest SOFA ${{ inputs.sofa_version }} binaries from GitHub (2/2)
+      shell: bash
       run: |
         SOFA_OS_GITHUB="$RUNNER_OS"
         if [[ "$SOFA_OS_GITHUB" == "Linux" ]]; then
