@@ -411,7 +411,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
-        releaseNameRegEx: 'v${{ inputs.sofa_version }}.*'
+        releaseNameRegEx: '${{ inputs.sofa_version }}.*'
 
     - if: ${{ inputs.sofa_version }} != 'master'
       name: Get the latest SOFA ${{ inputs.sofa_version }} binaries from GitHub (2/2)
