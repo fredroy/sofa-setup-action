@@ -16,7 +16,7 @@ inputs:
     default: 'true'
   python_version:
     description: 'Python version to install'
-    default: '3.8'
+    default: '3.10'
   numpy_version:
     description: 'numpy version to install'
     default: 'latest'
@@ -197,7 +197,7 @@ runs:
 
     - name: Install Python
       id: install-python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python_version }}
 
@@ -223,12 +223,17 @@ runs:
         else
           PYTHON_EXE="python-executable-not-found"
         fi
+
         echo "PYTHON_ROOT=$PYTHON_ROOT" | tee -a $GITHUB_ENV
         echo "Python_ROOT=$PYTHON_ROOT" | tee -a $GITHUB_ENV
         echo "PYTHON_EXE=$PYTHON_EXE" | tee -a $GITHUB_ENV
+        echo "PYTHON_EXECUTABLE=$PYTHON_EXE" | tee -a $GITHUB_ENV
+        echo "PYTHON_LIBRARIES=$PYTHON_ROOT/x64/lib/libpython3.8.dylib" | tee -a $GITHUB_ENV
+        echo "PYTHON_INCLUDE_DIRS=$PYTHON_ROOT/x64/include" | tee -a $GITHUB_ENV
         echo "python_root=$PYTHON_ROOT" >> $GITHUB_OUTPUT
         echo "python_version=${{ steps.install-python.outputs.python-version }}" >> $GITHUB_OUTPUT
         echo "python_exe=$PYTHON_EXE" >> $GITHUB_OUTPUT
+        echo "python_executable=$PYTHON_EXE" >> $GITHUB_OUTPUT
         echo "------- ls -la PYTHON_ROOT -------"
         ls -la "$PYTHON_ROOT"
         echo "----------------------------------"
