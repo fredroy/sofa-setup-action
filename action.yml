@@ -283,7 +283,7 @@ runs:
         echo '------------------------------'
 
     - name: Setup cache for pybind11 files
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       id: pybind11_cache
       with:
         path: ${{ env.PYBIND11_INSTALL_DIR }}
@@ -305,7 +305,7 @@ runs:
 
     - name: Setup cache for Qt files
       if: inputs.sofa_scope != 'minimal'
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       id: qt_cache
       with:
         path: ${{ env.QT_INSTALL_DIR }}
@@ -340,7 +340,7 @@ runs:
         echo "$Qt5_ROOT" >> $GITHUB_PATH
 
     - name: Setup cache for Boost files
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       id: boost_cache
       with:
         path: ${{ env.BOOST_INSTALL_DIR }}
@@ -381,7 +381,7 @@ runs:
         fi
 
     - name: Setup cache for Eigen files
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       id: eigen_cache
       with:
         path: ${{ env.EIGEN_INSTALL_DIR }}
